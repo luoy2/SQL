@@ -1,0 +1,1 @@
+DROP TABLE `movedb`.`position_compare`, `movedb`.`position_new`, `movedb`.`position_old`;

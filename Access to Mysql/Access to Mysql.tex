@@ -1,0 +1,857 @@
+\documentclass[paper = letterpaper, fontsize=12pt]{article}
+\usepackage[utf8]{inputenc}
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{9} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{9}  % for normal
+\DeclareUnicodeCharacter{00A0}{ }
+\usepackage[english]{babel}
+\usepackage{csquotes}% Recommended
+\usepackage[protrusion=true,expansion=true]{microtype}  
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+\usepackage[pdftex]{graphicx}
+\graphicspath{{pic/}}
+\usepackage{palatino,amssymb}
+\usepackage[margin=0.85in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{indentfirst}
+\usepackage{apacite}
+\usepackage{float}
+\usepackage{sectsty}
+\allsectionsfont{\centering \normalfont\scshape}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{caption}
+% Defining colors
+\usepackage{color}
+\usepackage{pdfpages}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0} 
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+\long\def\/*#1*/{}
+% Define linespread and parskip
+\linespread{1.5}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{1.5em}
+
+
+
+\usepackage{listings}
+\lstset{ %
+  basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=1,                   % the step between two line-numbers. If it's 1, each line
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. commens (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                 % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},      % keyword style
+  commentstyle=\color{dkgreen},   % comment style
+  stringstyle=\color{deepgreen},      % string literal style
+  escapeinside={\%*}{*)},         % if you want to add a comment within your code
+  morekeywords={*,...}            % if you want to add more keywords to the set
+} 
+
+\lstdefinestyle{Common}
+{
+    extendedchars=\true,
+    language={[Visual]Basic},
+    frame=single,
+    %===========================================================
+    framesep=3pt,%expand outward.
+    framerule=0.4pt,%expand outward.
+    xleftmargin=3.4pt,%make the frame fits in the text area. 
+    xrightmargin=3.4pt,%make the frame fits in the text area.
+    %=========================================================== 
+}
+
+\lstdefinestyle{VBA}
+{
+    style=Common,
+    basicstyle=\scriptsize\color{black}\ttfamily,
+    keywordstyle=\color{orange},
+    identifierstyle=\color{cyan},
+    stringstyle=\color{red},
+    commentstyle=\color{green}
+}
+
+% Python style for highlighting
+\newcommand\pythonstyle{\lstset{
+  language=Python,
+  backgroundcolor=\color{white}, %%%%%%%
+  basicstyle=\ttm,
+  otherkeywords={self},            
+  keywordstyle=\ttb\color{deepblue},
+  emph={MyClass,__init__},          
+  emphstyle=\ttb\color{deepred},    
+  stringstyle=\color{deepgreen},
+  commentstyle=\color{red},  %%%%%%%%
+  frame=tb,                         
+  showstringspaces=false            
+}}
+
+% Python environment
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+\pagestyle{fancyplain}
+\fancyhead{}                                            % No page header
+\fancyfoot[L]{}                                         % Empty 
+\fancyfoot[C]{}                                         % Empty
+\fancyfoot[R]{\thepage}                                 % Pagenumbering
+\renewcommand{\headrulewidth}{0pt}          % Remove header underlines
+\renewcommand{\footrulewidth}{0pt}              % Remove footer underlines
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}}     % Horizontal rule
+
+\title{
+        %\vspace{-1in}  
+        \usefont{OT1}{bch}{b}{n}
+        \normalfont \normalsize \textsc{University of Illinois Urbana Champaign} \\ [25pt]
+        \horrule{0.5pt} \\[0.4cm]
+        \huge Term Structure Final Report \\
+        \horrule{2pt} \\[0.5cm]
+}
+\author{
+        \normalfont                                 \normalsize
+        Junqi Liao \\
+       \normalfont      \normalsize
+        Xingyu Peng \\
+       \normalfont      \normalsize
+        Yikang Luo\\ 
+        \normalfont     \normalsize
+        Zhao Li \\
+                \normalsize
+        \today
+}
+
+\date{}
+
+%%% Begin document
+\begin{document}
+\maketitle
+\begin{abstract}
+In this project, we downloaded data from bloomberg and calibrated BDT and LMM model to this data. Then, we priced different tenors and expirations of European Swaptions,a Bermudan Swaption and a JP.Morgan Fixed Rate Notes by applying these two models. At last, we discussed the difference of the results came from theses two models.
+
+\end{abstract}
+
+
+
+
+\section{Data Preparation}
+	The main data we needed were forward rate, cap implied volatility and swaption implied volatility. At first, we tried use Bloomberg Excel Macro to download LIBOR deposit rate, Eurodollar rate and FRA and calculate our forward rate on our own, but we kind of messed up the process. Thus, at last, we used Bloomberg SWDF function(curve analysis – forward analysis) to download our forward rate from 10/31/2016 to 4/29/2067(settle date start at 10/27/2016). Our forward data looks like this: 
+	
+
+\begin{center}
+\begin{tabular}{rrr} \toprule
+\emph{Date} & \emph{Zero Rate} & \emph{Forward Rate} \\
+	    \midrule
+	    10/31/2016 & 0     & 0.88733 \\
+	    01/31/2017 & 0.908076866 & 1.006253058 \\
+	    04/28/2017 & 0.95158069 & 1.023725171 \\
+	    07/31/2017 & 0.984546008 & 1.079827359 \\
+	    10/31/2017 & 1.014739341 & 1.132719842 \\
+	    01/31/2018 & 1.043696585 & 1.180230388 \\
+	    04/30/2018 & 1.064544985 & 1.204534356 \\
+	    07/31/2018 & 1.088629462 & 1.228072088 \\
+	    10/31/2018 & 1.109709605 & 1.292061364 \\
+	    01/31/2019 & 1.133392312 & 1.334461555 \\
+	    04/30/2019 & 1.152226242 & 1.376572577 \\
+	    07/31/2019 & 1.17561373 & 1.418850942 \\
+	    10/31/2019 & 1.198715528 & 1.46733081 \\
+	    01/31/2020 & 1.222086533 & 1.509118579 \\
+	    04/30/2020 & 1.242778329 & 1.550538192 \\
+	    07/31/2020 & 1.265783679 & 1.591582126 \\
+	    10/30/2020 & 1.287436191 & 1.635834615 \\
+	    01/29/2021 & 1.310040775 & 1.675822873 \\
+	    04/30/2021 & 1.330779393 & 1.71579438 \\
+	    07/30/2021 & 1.352224167 & 1.754967383 \\
+	    10/29/2021 & 1.374277815 & 1.789877236 \\
+	    01/31/2022 & 1.397306625 & 1.82728891 \\\bottomrule
+	     \hline
+	  \end{tabular}
+	  \captionof{table}{forward rate}
+	  \end{center}
+
+
+Meanwhile, for model calibration, we downloaded cap implied volatility and swaption implied volatility on the same starting date. Due to the limitation of Bloomberg Academic, we could not export the data into an excel file, thus we took a screenshot and manually input those implied volatility into our model later.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{01.png}
+        \caption{The implied volatility for cap}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{02.png}
+    \caption{Black implied volatility on 10/31/2016}
+\end{figure}
+
+
+\section{BDT Calibration}
+\subsection{Caplet Volatility Calculation}
+
+The first part for the calibration is always the cleaning up of the data. We selected eight years
+forward rate data and cap implied volatility data to do the calibration on 10/31/2016, in order to evaluate the J.P. Morgan real product easier. For data cleaning, we did the following process:
+
+Step 1: Calculate the correct day count.
+	
+Step 2: Calculate the zero-coupon bond price by using the real/360 day count and the forward rate. In the graph below, the formula for zero coupon bond price is :
+\begin{align}
+	F(t; T, T+\tau) &= \frac{1}{\tau}(\frac{P(t, T)}{P(t, T+\tau)} -1)\\
+	P(t, T+\tau) &= \frac{P(t, T)}{1+F(t; T, T+\tau)*\tau}
+\end{align}
+	
+ 
+Step 3: Calculate the forward swap rate in order to stripping out the caplets price and implied volatility;
+\[
+	S_{T_0, T_n}(t) = \frac{P(t, T_0) - P(t, T_n)}{\sum_{i=0}^{n-1}\tau_iP(t, T_{i+1})}
+\] 
+
+The previous three steps looks like below in Excel spreadsheet (data for BDT.xlsm) ---- We followed the example spreadsheet from homework five, except using our own data:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{03.png}
+    \caption{Swap Rate and Zero Coupon Bond Calculation}
+\end{figure}
+
+	  
+Step 4: Calculate the black caplets prices by using forward swap rate as strike, implied volatility as input volatility, PDB price, spot rate and forward rate in excel spread sheet, and simply applying the Black formula:
+\begin{align*}
+	Caplet(0, T, T+\tau, K) &= N\tau P(0, T+\tau)(F(0;T,T+\tau)N(d_1) - KN(d_2)_)\\
+	Where\\
+	d_1 &= \frac{ln(\frac{F(0;T,T+\tau)}{K}) + \frac{1}{2}\sigma_{black}^2T}{\sigma_{black} \sqrt{T}}\\
+	d_2 &= \frac{ln(\frac{F(0;T,T+\tau)}{K}) - \frac{1}{2}\sigma_{black}^2T}{\sigma_{black} \sqrt{T}}
+\end{align*}
+
+The price of cap is simply the sum of all the caplets.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{05.png}
+    \caption{cap black price calculation}
+\end{figure}
+ 
+Step 5: Make another table of caplets, and set caplet volatility as variable.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{06.png}
+    \caption{caplet price}
+\end{figure}
+  
+Step 6: Solve the caplet volatility by making the caplet price as close as the black price.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{07.png}
+    \caption{volatility solver}
+\end{figure}
+
+ We wrote a EXCEL VBA code to do the solving for all the caplet implied volatilities.
+ 
+\begin{minipage}{\linewidth}
+\begin{lstlisting}[style=VBA]
+Sub solver()
+'
+' solver Macro
+'
+    Dim rngObjectCells As Range
+    Set rngObjectCells = Range("G51:G81")
+
+
+    Dim rngObjectCell As Range
+
+    For Each rngObjectCell In rngObjectCells
+
+        SolverReset
+        SolverAdd CellRef:=rngObjectCell.Offset(0, -2).Range("A1:A1").Address, Relation:=3, FormulaText:="0.1"
+        SolverOk SetCell:=rngObjectCell.Address, MaxMinVal:=2, ValueOf:=0, ByChange:=rngObjectCell.Offset(0, -2).Range("A1:A1").Address, _
+            Engine:=1, EngineDesc:="GRG Nonlinear"
+        SolverSolve True
+
+
+    Next
+
+End Sub
+
+\end{lstlisting} 
+\end{minipage}
+	
+The whole excel calculating macro sheet would be attached as “data for BDT.xlsm”.
+
+\subsection{BDT $U$ Parameter Adjusting}
+After calculated the zero coupon bond prices, caplet implied volatility and caplet prices, we are ready to calibrate BDT model as our one-factor model to them. We developed python code to do the calibration. For our trees, we choose pandas dataframe as our data structure; And we used scipy.optimize package to numerically minimize our error function. 
+
+We construct our tree with a $\Delta t$ value of 1 month. Since we only have our coupon bond price in 3 month form, the very first step is linearly interpolated all the missing value of our zero coupon bond log price:
+ 
+
+ Then, we can start our calibration from t equals to 0 and 1.
+\begin{python}
+# at t = 0
+r.iloc[0][0] = -np.log(P[1]) / delta_t
+U = [r.iloc[0][0]]
+d.iloc[0][0] = math.exp(-r.iloc[0][0] * delta_t)
+pi.iloc[0][0] = 1
+# at t = 1
+pi.iloc[1][0] = 0.5 * pi.iloc[0][0] * d.iloc[0][0]
+pi.iloc[1][1] = 0.5 * pi.iloc[0][0] * d.iloc[0][0]
+\end{python}
+
+Since we have our zero coupon price already, we can initialize our short rate r, U, Arrow-Deberu price tree $\hat{\pi}$, and discount factor d. Then, we can calculate $\hat{\pi}(1,1)$ and $\hat{\pi}(1, 0)$, based on the data we calculated from the previous step. 
+
+Next, defining our error function(Minimize square error of zero coupon bond price we calculated and the market zero coupon bond price)and solve the value for U(1):
+\begin{python}
+def errorfn(U, round):
+    sum = 0
+    for j in range(round + 1):
+        sum += pi.iloc[round, j] * math.exp(-U * math.exp(
+            (2 * j - round) * sigma[round] * math.sqrt(delta_t)) * delta_t)
+    return pow(sum - P[round + 1], 2)
+W = scipy.optimize.minimize_scalar(errorfn, args=(1))
+\end{python}
+
+After we’ve got U(1), we can calculate $r_{1,x}$ and $d_{1,x}$. Thus, from time $t = 2$ to $t = 96$, we can iteratively calculate our $\hat{\pi}$, then U, then r and d, and finally finish constructing our short rate tree and Arrow-Deberu price tree.
+
+\subsection{BDT $\sigma$ Parameter Adjusting (calibrate to cap)}
+Now, to calibrate our model to CAP data, we need the volatility for caplets.
+
+First assume that the caplet volatilities are the volatility of the short rate as explained in Lecture 6.  That is saying, after set the initial volatilities $\sigma(0) = 0$, based on the caplets volatility we stripping out, we initialize sigma as following:
+
+$\sigma$(1) to $\sigma$(11) equals to the first three caplet IV 39.4\%;
+
+$\sigma$(12),  $\sigma$(13), $\sigma$(14), equals to the forth caplet IV 41.47\%;
+
+…
+
+By changing it every 3 terms, our last three $\sigma$, $\sigma$(93), $\sigma$(94), $\sigma$(95) equals to the last caplet IV 43.47\%. Following is the detail table showing how we initialize our $\sigma$.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{08.png}
+    \caption{Initialize $\sigma$}
+\end{figure}
+ 
+
+
+Now we want to value each of the caplets and compare our tree value to the market value. Define a function that can give us the caplet value by using tree induction technique:
+\begin{python}
+def get_caplet(final_node, K, shortrate_tree, ad_tree):
+    cb_tree = pd.DataFrame(np.nan, index=range(final_node + 1),
+                           columns=list(range(final_node + 1)))
+    cb_tree.iloc[final_node] = [1.0] * (final_node + 1)
+    for i in reversed(range(final_node - 3, final_node)):
+        for j in reversed(range(i + 1)):
+            cb_tree.iloc[i][j] = (0.5 * cb_tree.iloc[i + 1][j + 1] + (1 - 0.5)
+                                  * cb_tree.iloc[i + 1][j]) / (
+                                     1 + shortrate_tree.iloc[i][j] * delta_t)
+    payoff_tree = cb_tree.copy()
+    payoff_tree.iloc[final_node - 3] = [
+        0.25 * val * max((1 / 0.25) * (1 / val - 1) - K, 0) for val in
+        cb_tree.iloc[final_node - 3]]
+    cap_val = [i * j for i, j in
+               zip(payoff_tree.iloc[final_node - 3],
+                   ad_tree.iloc[final_node - 3])]
+    return np.nansum(cap_val)
+\end{python}
+
+
+Comparing of the caplet price we calculated with the market caplet price, we found out that there is some difference between the prices as following:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{09.png}
+    \caption{Caplet Difference}
+\end{figure}
+ 
+
+Thus we need to adjust the volatility parameters $\sigma$(n) (piecewise constant) so that the tree caplet price is exactly equal to the market caplet price in furthering.
+
+We looped through the whole calibration procedure again, but instead we make the sigma parameter variable and our optimization goal this time is minimize the sum of square error of market caplet prices and tree caplet prices. After all the adjustments, the adjusted volatility and caplet price looks like below:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{10.png}
+    \caption{Adjusted Volatility and Caplet Price}
+\end{figure}
+
+
+As we can see, by slightly adjusting the caplet volatility, we can fit our model well to market caplet data. However, we need to double check how the change of volatility could affect our model accuracy of zero coupon bond price. Thus, with our new short rate tree constructed by the adjusted sigma parameter, we calculated the zero coupon bond price and compared it with real ZCB price:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{11.png}
+    \caption{Zero Coupon Bond Price Difference}
+\end{figure}
+ 
+By looking into the zero coupon bond price, we found out that the error is relatively small. Thus, at this point, we can conclude that by changing U and sigma value together we can get a short rate tree from BDT model, with a good fit to the market caplet price and zero coupon bond price.
+
+\subsection{LMM Calibration}
+At first, we would like to briefly talk about the LMM model. This is a market model that can be used to show us in brief the dynamics of such observable market quotes of different kinds of financially tradable products like bond, future and stocks. This is much way better than falling back on a hidden process of driving the entirety of the fixed income market. As the relevant paper and report said, a Libor Market Model (LMM) is built in the base of the discretization of the yield curve into discrete spanning forward rates. And according to each different forward rates, we can immediately find out the modelled market quote and its related FRA.
+
+From what we calculated and modelled, we believe LMM is necessary to use. In the Black model, the forward rate and swap rate could be lognormal with zero drift, if we use the appropriate numeraire. But on the other hand, if we believe that the forward rate follows a lognormal distribution, there is no way to believe that the swap rate follows the lognormal distribution as well. Besides, if we set a proper numeraire, such that one of the forward rate could be with zero drift, and then the other forward rates will not necessarily be driftless. From these we can say that we need to calculate and model the drift of forward rates under different measures. And that is what LMM good at.
+
+Comparing with one-factor model, LMM is directly observable rather than evolve the instantaneous forward rates.
+
+Then, for the calibration, we use the same notation as in the lecture notes:
+
+$t = 0   \rightarrow T(0) \rightarrow T(M)$
+
+\large
+\textbf{Step 1:  Import data and parameters set-up}
+\normalsize
+
+  Our input data includes: 
+\begin{itemize}
+\item T (measured in correct day count) from $T_0$= 0  to $T_{32}$= 8.117
+\item forward rates as in $t = 0$
+\item implied volatility of caplets
+\item discount factor P(0, T)
+\end{itemize}
+
+Our input parameter includes:
+\begin{itemize}
+\item $n$: caplet / swaption expiration measured in $T_n$ = T(0) in our case
+\item Maturity: measured in 3-month
+\item $\beta$: the parameter in the first simple instantaneous correlation function
+\item num of simulation: number of simulations
+\end{itemize}
+\large
+
+\textbf{Step 2: Correlation, covariance matrix, square root matrix set-up}
+
+\normalsize
+For correlation function, we choose the first one of the simple instantaneous correlation functions for simplicity:
+\[
+\rho_{i,j} = \rho(i - j) = exp(-\beta\arrowvert T_i - T_j\arrowvert), \quad \beta \ge 0
+\]
+ 
+For covariance matrix, we assume constant volatility between $t = 0$ and $T(0)$, so
+\begin{align*}
+C_{ij} &= \int_S^T \sigma_i \sigma_j \rho_ij T(0)\\
+\Downarrow\\
+C_{ij} &= \sigma_i \sigma_j \rho_ij T(0)
+\end{align*}
+
+For square root matrix, we applied Chelosky Factorization to find the lower triangle matrix.
+
+\large
+\textbf{Step 3: Monte Carlo Simulation}
+
+\normalsize
+For drifts, we use the Iterative Predictor corrector of the following form:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{17.png}
+\end{figure}
+Then we choose the long jumps so that the overall process becomes:
+ \begin{figure}[H]
+     \centering
+     \includegraphics[width=0.6\textwidth]{18.png}
+ \end{figure}
+With the above formula, we are able to generate paths of the forward rates $F_k (T(0))$.
+
+In a nutshell, when calibrating the model, we made several choices considering calibration to data and implementation: 
+\begin{enumerate}
+\item Instantaneous correlation function: we use the simple function with one parameter beta for simplicity and make it easier to calibrate to data.
+\item covariance matrix: we assume constant volatility to get the covariance matrix between t= 0 and $t = T(0)$ because to calibrate the Black price we believe it’s reasonable to use the constant volatility assumption.
+\item We use long jumps instead of very long jumps because it can be used to price both European swaptions and Bermudan swaptions.
+
+\end{enumerate}
+
+
+
+
+
+\section{Swaption Evaluation}
+\subsection{Tenor and Expiration}
+The European swaptions we priced have different tenors and expiration dates. We priced the European swaption start at 10/31/2016, quarterly settlement, with expiration from 1 year to 3 years, and tenors from 1 years to 5 years. Thus, there are 15 European swaption in totally.
+
+The first step is to calculate the swap rate. It can be simply calculated by zero coupon bond price:
+\[
+	S_{T_0, T_n}(t) = \frac{P(t, T_0) - P(t, T_n)}{\sum_{i=0}^{n-1}\tau_iP(t, T_{i+1})}
+\] 
+Then, the black formula gave us the market price of swaption:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.48\textwidth]{12.png}
+\end{figure}
+
+\subsection{BDT Evaluation}
+For BDT European swaption calculation, first calculate the coupon that need to be paid at each step. For example, if we want to calculate a 2 year swaption on a three year swap, whch implied volatility is 0.4787, we need to do the following:
+
+Step 1: swap rate can be calculated by using the formula above:
+
+	Swap rate = 0.01566421021345782
+
+Step 2: calculate the black price: 
+
+	Black swaption price= 0.0120277592239289
+	
+Then we need to construct a 60 step valuation tree.  We want to add a coupon payment for each step, thus from node 27 to node 57, our coupon payment to be added is:
+\[
+	cN = swaprate*0.25 = 0.003916052553364455
+\]
+and cN equals to 0 for all the other nodes.
+
+Start our tree induction from the last node, all the value at node 60 is:
+\[
+1+ swaprate * 0.25 =1.003916052553364455
+\]
+Then, for each node:
+\[
+V_{i,j} = \frac{1}{1+r_{i,j}\Delta t}[\pi V_{i+1, j+1} + (1-\pi)V_{i+1, j}] + cN
+\]
+Stop the induction at step 24, which is the expiration time of our swaption. The payoff is simply $max(1-V, 0)$.
+
+\begin{python}
+CB = BDT_tree.iloc[expiration * 12]
+swaption_payoff = CB.apply(lambda x: max(1 - x, 0), 0)
+swaption_payoff_pv = swaption_payoff * pi_1.iloc[expiration * 12]
+swaption_value = np.sum(swaption_payoff_pv[:(expiration * 12 + 1)])
+\end{python}
+Multiply every payoff at this step with the Arrow-Deberu price tree value, and the summation is the swaption value we want: 0.012615431658894
+
+Now, let's compare the black value and the tree value:
+\[
+(0.012615431658894 - 0.0120277592239289)/0.0120277592239289 = 0.0488
+\]
+
+Thus, the difference is 4.9\% for this 2 year expiration, 3 year tenor European swaption.
+
+By writing a for loop in python code, we can calculat all the 15 swaption value. We will compare it after the algorithm of LMM model evaluation.
+\subsection{LMM Evaluation}
+EUROPEAN SWAPTIONS:
+To make sure we used the correct volatilities, we calibrate the LMM to the caplet prices and find we have correct volatilities.
+
+Then we use our current model to price swaptions. We implemented LMM on a total of 15 swaptions with different expirations and tenors. However, the result is not good. The largest difference between our price and theoretical Black price is over 80\% and the average difference is 40\%. We believe there might be a problem with the correlation between the forward rates. As our BDT yields excellent results, we decide to lower the value of $\beta$ in our correlation function to make LMM closer to BDT. The result becomes better as we lower the value of $\beta$ from 0.1 to 0.05.  By adjusting the value of beta we are able to calibrate our LMM to swaptions better and better. The final value of $\beta$ is fixed at 0.045. 
+
+\subsection{Comparison}
+For LMM, the result figure are as following:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{15.png}
+    \caption{European Swaption Price(LMM)}
+\end{figure}
+
+All the 15 European swaption price are evaluated as following:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{13.png}
+    \caption{European Swaption Price(BDT)}
+\end{figure}
+
+The average error is just 3.35\% for BDT model, while LMM gave us an average error of 13.38\%. We think the BDT model actually perform well on European swaption evaluation. The reason that LMM seems to underperform BDT is that LMM is more difficult to calibrate. For instance, we have to make correct assumptions about the instantaneous volatility function and choose the right one to make the model more robust. The fact that LMM allows for more flexibility also means we might not be able to calibrate a really good one. However, given more time and more practice, we believe we can make LMM as accurate as BDT in pricing swaptions. Another small problem with LMM is due to the weakness of Monte Carlo simulation. Monte Carlo simulation might be slow to converge and some variance reduction techniques might be needed. 
+
+In summary, LMM does have some advantages over BDT. First, LMM uses Monte Carlo Simulation while BDT builds a short rate tree. When pricing the product with complicated features such as barriers, it is not easy or possible to use BDT to price such a product. However, with simulation, we can price complicated products.
+
+When the number of time steps are getting large, implementing a BDT tree would also cost too much computational power.
+
+When trying to calibrate a LMM, we find there are a lot choices in calibration such as correlation function, long jumps or short jumps, which we believe would give us more flexibility in pricing different real world products in different situations.
+
+
+
+
+\section{Bermudan Swaption Evaluation}
+\subsection{Terms}
+We chose to value a 2-year Bermudan swaption, which is into a five-year swap issued at time 0, receiving 6-month LIBOR and paying 0.5\%. We also assumed that the swaption can be exercised at time t=0.25, 0.5, 1, 1.25, 1.5, 1.75 and 2 years.
+\subsection{BDT model}
+We used the short rate tree that we derived from the BDT model as input. The Bermudan Swaption evaluation process is actually similar as the European swaption; the only difference is that we need to calculate the early exercise value. 
+\[
+EE_{i, j} =  N - CB_{i, j}
+\]
+
+We first valued a five-year coupon bond which pays coupon quarterly 
+\[
+CV_{i, j} = \frac{\pi V_{i+1, j+1} + (1-\pi)V_{i+1,j}}{1+r_{i,j}} + cN
+\]
+
+Then, by using tree backward induction:
+\begin{align}
+V_{i, j} = max(CV_{i,j}, EE_{i,j})
+\end{align}
+
+We got the results are as following:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{14.png}
+    \caption{Bermudan Swaption Tree Induction}
+\end{figure}
+
+Based on the short rate tree derived by BDT model, the price of such Bermudan Swaption is 0.042718.
+
+\subsection{LMM model}
+Then we continue to apply LMM to the same Bermudan swaption as in the BDT.
+
+To price Bermudan swaptions, we first simulated paths of forward rates start from $T_1$ to $T_n$. Then we calculated the early exercise value of these paths. After that, we use regression to find out the relationship between the continue value and the swap rate, remaining forward rate. Finally, we use the regression result to approximate the continuation value at each $T_i$, which can be compared with the early exercise value to determine the value of the Bermudan swaption.
+As the detailed steps have already been discussed in the lecture notes, here are the regression details because the regression seems to be the key of the valuation.
+\begin{align}
+  y^i &= \hat{Cont.\;Value^i}(T_k)\\
+  X_1^i &= F_{k+1}^i(T_k)\\ 
+  X_2^i &= S_{T_k, T_{M}}^i(T_k)\\
+  Where \quad S_{T_k, T_{M}}^i(T_k) &= \frac{1 - P^i(T_k, T_{M})}{\sum_{j=k+1}^{M} \tau^\star P^i(T_k, T_j)}\\
+  P(T_k, T_j) &= \frac{1}{\prod_{m = k+1}^j(1+F_m^i(T_k)\tau_m)}
+\end{align}
+
+Finally, regression function $\hat{Cont.\;Value^i}$:
+\[
+\hat{Cont.\;Value^i} = y_i = b_0 + b_1x_1^i + b_2x_2^i + b_3(x_1)^2 + b_4(x_2)^2 + b_5x_1^ix_2^i + \epsilon^i
+\]
+There will be more detail about the LMM process in real world product pricing session, and here are the results of regression by Matlab:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{16.png}
+    \caption{LMM regression}
+\end{figure}
+
+Our final result after 10,000 times of simulation is 0.0592, which is not very close to the BDT result.
+
+In fact, the deviation from the BDT result is within our expectation. The key reason is the regression. While our regression seems to yield good result in terms of R-square, we still believe that such a regression might not be so reasonable to accurately predict other continuation values. After all, we only include two variables and their higher rank functions. 
+
+When pricing products with early exercise features, using Monte Carlo simulation might cause the problem of Monte Carlo within Monte Carlo. Although dynamic programming e.g. using regression to approximate continuation value might be a solution, it is not the best way. In this sense, a tree method is a better way. 
+
+
+
+
+\section{JP.Morgan Product Pricing ---- Callable Step-Up Fixed Rate Notes}
+
+\subsection{Product Introduction}
+The product we facing this time is Callable Step-Up Fixed Rate Notes, which is due on October 31, 2024. It is published by JP. Morgan Chase\& Co. With the feature that from 2020 to 2024 maturity, every April 30th and October 31st, the company will have the choice to decide whether they will redeem this note. It can only be redeem in whole, and once JP Morgan has decided to redeem all their notes, you will get paid of your whole principal value plus all the accrued and unpaid interests. 
+
+As for the interest rate, for the applicable Interest Period, the Interest Rate on your notes will be equal to:
+% Table generated by Excel2LaTeX from sheet 'cleaned data'
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{ccc}
+    \toprule
+    \textbf{From (and including)} & \textbf{To (but excluding)} & \textbf{Interest Rate} \\
+    \midrule
+    31-Oct-16 & 31-Oct-20 & 2.00\% per annum \\
+    31-Oct-20 & 31-Oct-21 & 2.25\% per annum \\
+    31-Oct-21 & 31-Oct-22 & 2.50\% per annum \\
+    31-Oct-22 & 31-Oct-23 & 4.00\% per annum \\
+    31-Oct-23 & 31-Oct-24 & 6.00\% per annum \\
+    \bottomrule
+    \end{tabular}%
+   \caption{Interest Rate Payment}
+  \label{tab:addlabel}%
+\end{table}%
+
+The product also contains a call feature. On April 30th and October 31st of each year, beginning on October 31, 2020 and ending on the Maturity Date (each, a “Redemption Date”), JPMorgan Chase \& Co. have the right to redeem the notes, in whole but not in part, at a price equal to the principal amount being redeemed plus any accrued and unpaid interest, subject to the Business Day Convention and the Interest Accrual Convention described below and in the accompanying product supplement.
+
+Subject to the Interest Accrual Convention, with respect to each Interest Period, for each \$1,000 principal amount note, the interest payment can be calculated as:
+\[
+	\$1,000 \times Interest\;Rate \times Day\;Count\;Fraction
+\]
+
+
+\subsection{LMM}
+As the introduction suggests, this product contains 5 different coupon payment period; We can construct our cash flow line as following:
+% Table generated by Excel2LaTeX from sheet 'Product0'
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{rrrrrrrrr}
+    \toprule
+    Step  & 0     & $T_0$ & $T_1$ & $T_2$ & …     & $T_{15}$ & …     & $T\_{31}$ \\
+    \midrule
+    Actual Time & 31-Oct-16 & 31-Jan-17 & 30-Apr-17 & 3-Nov-16 & …     & 31-Oct-20 & …     & 31-Oct-24 \\
+    \bottomrule
+    \end{tabular}%
+      \caption{Time Step}
+  \label{tab:addlabel}%
+\end{table}%
+
+We use time gap of 3 month only because 3 month forward rate is easier to obtain, which we have already derived from the BDT calibration part.Another thing that need to be noticed is that there are two different types of day counts:
+
+\quad$\tau_k = \frac{ACTUAL}{360};$ Discounting Forward Rates
+
+\quad$\tau_k^\star = \frac{30}{360};$ Coupon Sizes
+
+Then, looking at the coupon payments term, the first 7 coupon payments($T_1, T_3, T_5, ..., T_13$) were just simple coupon payments, which can be calculated simply as following:
+\begin{align}
+	Coupon_i &= \$1000 \times 0.02 \times \frac{180}{360} \times P(0, T_i)\\
+	\sum Coupon_i &= A
+\end{align}
+
+Denote the summation result as $A$, which we can deal with it later. The next step is simulating forward rates. We used long jump Monte Carlo technique from lecture 11 to do this simulation. So, From time step 16 to 31, by choosing the right zero coupon bond price as numerair, we simulated our forward rates:
+% Table generated by Excel2LaTeX from sheet 'Product0'
+\begin{table}[htbp]
+  \centering
+    \begin{tabular}{rrrrr}
+    \toprule
+    \emph{Time Step} & \emph{Forward Rates}\\
+    \midrule
+    $T_{15}$: & $F_{16}(T_{15})$ & $F_{17}(T_{15})$ & …     & $F_{31}(T_{15})$ \\
+    $T_{16}$: & $F_{17}(T_{16})$ & $F_{18}(T_{16})$ & …     & $F_{31}(T_{16})$ \\
+    .     &       &       &       &  \\
+    .     &       &       &       &  \\
+    .     &       &       &       &  \\
+    $T_{30}$: & $F_{31}(T_{30})$ &       &       &  \\
+    \bottomrule
+    \end{tabular}%
+  \label{tab:addlabel}%
+\caption{Forward Rate}
+\end{table}%
+
+It is reasonable to add a credit spread to all simulated forward rates; However, we didn't do so, 
+because we want to see how the pricing would go at the end ignoring any credit risk.
+
+For the call feature coupon payment, we applied the Longstaff and Schwartz Monte Carlo Technique from lecture 11. We ran a lot of paths, and get all forwards rates on each path. Then, for the evaluation, on each path/simulation $i$:
+
+At $T_{31}$(Oct 2024):
+\[
+	Q_{31}^i = 1000(1+0.06\times\frac{180}{360}) = 1030
+\]
+
+Then, at $t = T_{29}$ (Apr 2024, note that it's not $T_{30}$), we need to decide our value if the note was called and the continuous value on each path:
+\begin{align}
+	Call\;Value^i &= 1000(1+0.06\times\frac{180}{360})\\
+	Cont.\;Value^i &= P^i(T_{29}, T_{31}) * Q_{31}^i\\
+	P^i(T_{29}, T_{31}) &= \frac{1}{\prod_{k=30}^{31}(1+F_k^i(T_{29}\tau_k)}\\
+	\tau_k &= \frac{ACTUAL}{360}
+\end{align}
+
+We used regression to get a $\hat{Cont.\;Value^i}$, and thus decide the value of $Q_{29}^i$
+\[
+    Q_{29}^i = 
+\begin{cases}
+    \frac{Call\;Value^i}{P^i(T_{29}, T_{31})},& \text{if } Call\;Value^i< \hat{Cont.\; value^i}\\
+    \frac{Cont.\;Value^i}{P^i(T_{29}, T_{31})},              & \text{otherwise}
+\end{cases}
+\]
+
+Then followed step by step, at time $t = T_{27}$(Oct 2023):
+\begin{align}
+	Call\;Value^i &= 1000(1+0.06\times\frac{180}{360})\\
+	Cont.\;Value^i &= P^i(T_{27}, T_{31}) * Q_{29}^i + 1000\times0.06\times\frac{180}{360}\\
+	P^i(T_{27}, T_{31}) &= \frac{1}{\prod_{k=28}^{31}(1+F_k^i(T_{27}\tau_k)}\\
+	\tau_k &= \frac{ACTUAL}{360}
+\end{align}
+
+By regression:
+\[
+    Q_{27}^i = 
+\begin{cases}
+    \frac{Call\;Value^i}{P^i(T_{27}, T_{31})},& \text{if } Call\;Value^i< \hat{Cont.\;Value^i}\\
+    \frac{Cont.\;Value^i}{P^i(T_{27}, T_{31})},              & \text{otherwise}
+\end{cases}
+\]
+
+Followed by the procedure above, after 8 steps, we went back to $t = T_{13}$:
+\begin{align}
+  Call\;Value^i &= 1000(1+0.0225\times\frac{180}{360})\\
+  Cont.\;Value^i &= P^i(T_{13}, T_{31}) * Q_{17}^i + 1000\times0.025\times\frac{180}{360}\\
+  P^i(T_{13}, T_{31}) &= \frac{1}{\prod_{k=16}^{31}(1+F_k^i(T_{15}\tau_k)}\\
+  \tau_k &= \frac{ACTUAL}{360}
+\end{align}
+
+$\hat{Cont.\;Value^i}$ from regression:
+\[
+    Q_{15}^i = 
+\begin{cases}
+    \frac{Call\;Value^i}{P^i(T_{13}, T_{31})},& \text{if } Call\;Value^i< \hat{Cont.\; value^i}\\
+    \frac{Cont.\;Value^i}{P^i(T_{13}, T_{31})},              & \text{otherwise}
+\end{cases}
+\]
+
+Then, we get the present value of callable part for each path:
+\[
+  V^i = Q^iP(0, T_{31})
+\]
+
+At by get the mean of all the simulated PV of callable part, we can get the present value of the notes by sum the callable part and the pure coupon part value A(from equation(2) we calculated before:
+\begin{align}
+  V &= E[callable\;part]+ A\\
+  E[callable\;part] &= \frac{1}{N} \sum_{i=1}^{N}V^i
+\end{align}
+
+Now let's talk about how to estimating the $\hat{Cont.\;Value^i}$. We used OLS regression to do so:
+\begin{align}
+  y^i &= \hat{Cont.\;Value^i}(T_k)\\
+  X_1^i &= F_{k+1}^i(T_k)\quad e.g. \quad at\;t=T_{15},\;F_{16}^i(T_{15})\\
+  X_2^i &= S_{T_k, T_{31}}^i(T_k)\quad e.g. \quad at\;t=T_{15},\;Swap\;Rate\;S_{T_{15}, T_{31}}^i(T_{15})\\
+  Where \quad S_{T_k, T_{31}}^i(T_k) &= \frac{1 - P^i(T_k, T_{31})}{\sum_{j=k+1}^{31} \tau^\star P^i(T_k, T_j)}\\
+  P(T_k, T_j) &= \frac{1}{\prod_{m = k+1}^j(1+F_m^i(T_k)\tau_m)}
+\end{align}
+
+Thus, the $\hat{Cont.\;Value^i}$ would be a combination of those regressors above:
+\[
+\hat{Cont.\;Value^i} = y_i = b_0 + b_1x_1^i + b_2x_2^i + b_3(x_1)^2 + b_4(x_2)^2 + b_5x_1^ix_2^i + \epsilon^i
+\]
+
+After through all the process above, the product value we derived was 1103.458.
+\subsection{BDT}
+The product pricing part based on BDT model is relatively easier than that of LMM model. From the very first calibration part, we already got our short rate tree with 96 steps and the market P(0, T) data. 
+
+One thing that need to be pointed out is that after we got our short rate tree, it is for the best to add a credit spread to each $r_{i,j}$. However, we did not do so since we really want to say the difference between our evaluation and the real price, and thus having a roughly idea of the credit risk.
+
+So, the evaluation of the product is just nothing but a 96 steps tree backward induction. 
+
+Start at the last node(maturity):
+\[
+	V_{96, j} = 1000*(1  + 0.06*180/360)
+\]
+There are totally 15 different payment dates, and the first 7 are just single coupon bond evaluation. 
+
+For each step $i$, if $i \neq i_c(c = 6, 12, 18, …, 90)$, the value at this node is(no coupon paid):
+\[
+	V_{i, j} = \frac{1}{1+r_{i, j}*\delta t_i} (0.5 V_{i+1, j+1} + 0.5 V_{i+1, j})
+\]
+
+For $i = c$ and $i > 48$(callable period):
+\[
+	V_{i, j} =min( \frac{1}{1+r_{i, j}*\delta t_i} (0.5 V_{i+1, j+1} + 0.5 V_{i+1, j}), 1000) + coupon rate*180/360*1000
+\]
+
+For $i = c$ and $i < 48$(pure coupon period):
+\[
+	V_{i, j} = \frac{1}{1+r_{i, j}*\delta t_i} (0.5 V_{i+1, j+1} + 0.5 V_{i+1, j}+ coupon rate*180/360*1000
+\]
+
+Following is the first part of the pricing tree:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{19.png}
+    \caption{Real Product Pricing Tree}
+\end{figure}
+And as one can see from the tree, the product value we can derived from $V_{0,0}$ is 1011.540687. The rest of the tree would be attached in BDT\_daycout\_final.xlsx, ‘product’ table.
+
+\subsection{Comparison}
+Since the market price of this product is \$1000, both our model suggests that this product has been undervalued. However, note that we did not add any credit spread into our model, thus the real price of this product should be lower than we priced. In this case, we think \$ 1000 may be a reasonable price.
+
+The BDT model actually performs better on this particular product than LMM model, and we think the reason is the same as we discussed in the Bermudan Swaption pricing session. Actually, the project structure is nothing just a combination of callable coupon bond. Thus, we think regression is still our key reason, since we have checked our vol problems, drift problems and correlation problems.
+
+
+
+
+
+\/* 
+\section{Appendix}
+\label{sec:r}
+\begin{lstlisting}
+
+\end{lstlisting}
+
+\begin{python}
+\end{python}
+*/
+
+\newpage
+\bibliographystyle{apacite}
+\bibliography{bibliography}
+
+
+\end{document}
